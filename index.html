@@ -183,6 +183,48 @@
     text-transform: none;
     letter-spacing: normal;
   }
+  .terminal {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 0.9rem;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+  }
+  .term-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .term-dot.red { background: #ff5f56; }
+  .term-dot.yellow { background: #ffbd2e; }
+  .term-dot.green { background: #27c93f; }
+  .term-title {
+    margin-left: 0.5rem;
+    color: #8b949e;
+    font-size: 0.78rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .term-body {
+    margin: 0;
+    padding: 1.1rem 1.3rem 1.3rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #c9d1d9;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .term-prompt { color: #3fb950; }
   footer {
     text-align: center;
     color: var(--text-dim);
@@ -201,13 +243,33 @@
       </div>
     </header>
 
+    <div class="terminal">
+      <div class="term-bar">
+        <span class="term-dot red"></span>
+        <span class="term-dot yellow"></span>
+        <span class="term-dot green"></span>
+        <span class="term-title">damian@localhost</span>
+      </div>
+      <pre class="term-body"><span class="term-prompt">$</span> kubectl get nodes
+NAME      STATUS   ROLES           AGE    VERSION
+node-01   Ready    control-plane   214d   v1.31.2
+node-02   Ready    worker          214d   v1.31.2
+node-03   Ready    worker          201d   v1.31.2
+
+<span class="term-prompt">$</span> whoami
+damian // virtualisation . storage . netsec
+
+<span class="term-prompt">$</span> echo $STACK
+kubernetes python golang ansible bpf</pre>
+    </div>
+
     <div class="card">
       <h2>About</h2>
       <p>
         I build tools at the intersection of infrastructure, storage, and security. It's the kind of work that
         means reading kernel source as often as application code. Recent projects range from a Linux kernel
         module for NFSv4 ACL handling to observability stacks and local-first privacy tooling. Python and Go
-        are my daily drivers, with Ansible for automating the infrastructure around them.
+        are my daily drivers, with Kubernetes and Ansible running the infrastructure around them.
       </p>
       <p>
         I like understanding how a system actually behaves under the hood, then building something small and
