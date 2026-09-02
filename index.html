@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Damian Hubert &mdash; Introduction</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-soft: rgba(88, 166, 255, 0.12);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #ffffff;
+      --bg-card: #f6f8fa;
+      --border: #d0d7de;
+      --text: #1f2328;
+      --text-dim: #57606a;
+      --accent: #0969da;
+      --accent-soft: rgba(9, 105, 218, 0.08);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 3rem;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+  h1 {
+    margin: 0 0 0.25rem;
+    font-size: 1.5rem;
+  }
+  .handle {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .card h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-dim);
+  }
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+  li { margin-bottom: 0.5rem; }
+  li:last-child { margin-bottom: 0; }
+  .links {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .links a {
+    display: inline-block;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .links a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    margin-top: 2.5rem;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="avatar">&#128075;</div>
+      <div>
+        <h1>Damian Hubert</h1>
+        <div class="handle">@HubDamian95</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>About</h2>
+      <ul>
+        <li>&#128064; Interested in Virtualisation, Storage, and NetSec</li>
+        <li>&#127793; Currently learning more Python/Ansible and Golang</li>
+        <li>&#128159; Looking to collaborate on Intermediate Java, Python, and Golang projects</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Get in touch</h2>
+      <div class="links">
+        <a href="https://github.com/HubDamian95">GitHub</a>
+        <a href="mailto:hubert.dziedziczak@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/">LinkedIn</a>
+      </div>
+    </div>
+
+    <footer>Built and hosted with GitHub Pages.</footer>
+  </div>
+</body>
+</html>
