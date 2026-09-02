@@ -219,6 +219,48 @@
     white-space: pre;
   }
   .term-prompt { color: #3fb950; }
+  .skill-group {
+    margin-bottom: 1.1rem;
+  }
+  .skill-group:last-child {
+    margin-bottom: 0;
+  }
+  .skill-group h3 {
+    margin: 0 0 0.55rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .skill-group p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .chip {
+    font-size: 0.82rem;
+    color: var(--text);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.28rem 0.65rem;
+    white-space: nowrap;
+  }
+  .exp-list {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+  .exp-list li {
+    margin-bottom: 0.65rem;
+    font-size: 0.92rem;
+  }
+  .exp-list li:last-child {
+    margin-bottom: 0;
+  }
   footer {
     text-align: center;
     color: var(--text-dim);
@@ -262,6 +304,78 @@ same mindset.
 
 <span class="term-prompt">$</span> echo $STACK
 kubernetes python golang ansible bpf</pre>
+    </div>
+
+    <div class="card">
+      <h2>Skills</h2>
+      <div class="skill-group">
+        <h3>Kubernetes &amp; Orchestration</h3>
+        <div class="chips">
+          <span class="chip">Kubernetes (CKA)</span>
+          <span class="chip">Cilium</span>
+          <span class="chip">Calico</span>
+          <span class="chip">Multus (CNI)</span>
+          <span class="chip">Portworx</span>
+          <span class="chip">NetApp</span>
+          <span class="chip">VAST (CSI)</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>Storage &amp; Networking</h3>
+        <div class="chips">
+          <span class="chip">NFSv4.1</span>
+          <span class="chip">NFSv4.2</span>
+          <span class="chip">Kerberos-secured NFS</span>
+          <span class="chip">HPC / air-gapped clusters</span>
+          <span class="chip">DNS</span>
+          <span class="chip">GPU cluster scheduling (MIG, NVLink)</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>Infrastructure &amp; Automation</h3>
+        <div class="chips">
+          <span class="chip">Terraform</span>
+          <span class="chip">Jenkins</span>
+          <span class="chip">AWX</span>
+          <span class="chip">Golang (k8s operators)</span>
+          <span class="chip">Python</span>
+          <span class="chip">Bash</span>
+          <span class="chip">PowerShell</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>Observability</h3>
+        <div class="chips">
+          <span class="chip">Grafana</span>
+          <span class="chip">Prometheus</span>
+          <span class="chip">OpenTelemetry</span>
+          <span class="chip">VictoriaMetrics</span>
+          <span class="chip">ELK stack</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h3>K8s Controller Development</h3>
+        <p>Authoring and maintaining custom Kubernetes controllers/operators in Golang, plus Helm chart authoring, versioning, and amendments for in-house and third-party controllers across the stack.</p>
+      </div>
+      <div class="skill-group">
+        <h3>AI-Assisted Engineering</h3>
+        <p>Daily use of Claude Code and MCP-based tooling for infrastructure automation.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Experience &amp; Responsibilities</h2>
+      <ul class="exp-list">
+        <li>Identification and definition of system security requirements with a strong risk-based approach, as well as the design of computer security architecture and the development of detailed cybersecurity plans.</li>
+        <li>Engineering, implementation, and monitoring of security measures to protect computer systems, networks, and information from zero-day attacks.</li>
+        <li>Development of technical solutions to mitigate security vulnerabilities and automate repetitive tasks, such as new script tools in PowerShell and Python, as well as advising on proper firewall configuration across the estate.</li>
+        <li>Management of SSL/TLS certificates on devices across the estate.</li>
+        <li>Introduction of best practices and principles to enable consistent delivery and achieve long-term direction through the creation of appropriate documentation for these systems.</li>
+        <li>Technical lead for the implementation of a DMZ to increase security for VPN technology.</li>
+        <li>Administration and monitoring of Solarwinds and backups using technologies such as Veeam Backup and Spectra Libraries with Commvault.</li>
+        <li>Administration and troubleshooting of MS Office 365, AD, Exchange, and CIFS shares to ensure security.</li>
+        <li>Adherence to the ITIL framework using ServiceNow to maintain workflow on time and ensure work does not exceed the given deadline.</li>
+      </ul>
     </div>
 
     <div class="card">
