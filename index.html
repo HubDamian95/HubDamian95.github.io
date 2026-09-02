@@ -34,7 +34,7 @@
     line-height: 1.6;
   }
   .wrap {
-    max-width: 680px;
+    max-width: 760px;
     margin: 0 auto;
     padding: 4rem 1.5rem 3rem;
   }
@@ -103,6 +103,50 @@
     border-color: var(--accent);
     color: var(--accent);
   }
+  .projects {
+    display: grid;
+    gap: 1rem;
+  }
+  .project {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    transition: border-color 0.15s;
+  }
+  .project:hover {
+    border-color: var(--accent);
+  }
+  .project-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+  }
+  .project-head a {
+    font-weight: 600;
+    font-size: 1.02rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .project-head a:hover {
+    text-decoration: underline;
+  }
+  .lang {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.1rem 0.6rem;
+    white-space: nowrap;
+  }
+  .project p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
   footer {
     text-align: center;
     color: var(--text-dim);
@@ -128,6 +172,47 @@
         <li>&#127793; Currently learning more Python/Ansible and Golang</li>
         <li>&#128159; Looking to collaborate on Intermediate Java, Python, and Golang projects</li>
       </ul>
+    </div>
+
+    <div class="card">
+      <h2>Projects</h2>
+      <div class="projects">
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/omniscan">omniscan</a>
+            <span class="lang">Python</span>
+          </div>
+          <p>A unified OSINT CLI that aggregates open-source intelligence tools (Sherlock, Holehe, Maigret, GHunt, PhoneInfoga) behind one interface, letting you scan a username, email, or phone number across thousands of sites with a single command instead of juggling separate tools.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/nfs">nfs</a>
+            <span class="lang">C</span>
+          </div>
+          <p>Low-level Linux kernel tooling for NFSv4: a kernel module that invalidates a file's cached ACL, and a bpftrace script that live-traces NFSv4 GET_FACL calls at the kernel probe level &mdash; storage/networking internals work.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/check-global-websites-grafana-prometheus">check-global-websites-grafana-prometheus</a>
+            <span class="lang">Monitoring</span>
+          </div>
+          <p>A ready-to-deploy observability stack: Prometheus + Blackbox Exporter + Grafana tracking ICMP and HTTP latency for 25+ global targets on a live world heatmap, with install scripts to stand it up on Ubuntu/Debian in under 10 minutes.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/whisperstash">whisperstash</a>
+            <span class="lang">Python</span>
+          </div>
+          <p>Local-first encryption toolkit for sharing private text and files via a shared key &mdash; CLI, local browser UI, and a Chrome extension backed by a localhost daemon. No cloud backend; everything stays on-device.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/ollama-voice-to-cli">ollama-voice-to-cli</a>
+            <span class="lang">Python</span>
+          </div>
+          <p>Hands-free voice interface for a local Ollama model: Silero VAD detects speech automatically, faster-whisper transcribes it locally, and responses are streamed to the terminal and spoken aloud &mdash; fully local, no cloud APIs.</p>
+        </div>
+      </div>
     </div>
 
     <div class="card">
