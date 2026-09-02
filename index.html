@@ -32,9 +32,10 @@
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     line-height: 1.6;
+    overflow-x: hidden;
   }
   .wrap {
-    max-width: 760px;
+    max-width: 920px;
     margin: 0 auto;
     padding: 4rem 1.5rem 3rem;
   }
@@ -179,10 +180,15 @@
   }
   .terminal {
     background: #0d1117;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 1.25rem;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    margin-bottom: 1.75rem;
+    border-top: 1px solid #30363d;
+    border-bottom: 1px solid #30363d;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
   .term-bar {
@@ -208,17 +214,44 @@
     font-size: 0.78rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
+  .term-inner {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1.3rem 1.5rem 1.6rem;
+  }
   .term-body {
     margin: 0;
-    padding: 1.1rem 1.3rem 1.3rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.82rem;
-    line-height: 1.65;
+    font-size: 0.86rem;
+    line-height: 1.7;
     color: #c9d1d9;
-    overflow-x: auto;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 1.7em;
   }
   .term-prompt { color: #3fb950; }
+  .term-cursor {
+    color: #c9d1d9;
+    animation: term-blink 1s steps(1) infinite;
+  }
+  @keyframes term-blink {
+    50% { opacity: 0; }
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+    margin-bottom: 1.25rem;
+  }
+  .two-col .card {
+    margin-bottom: 0;
+  }
+  @media (max-width: 760px) {
+    .two-col {
+      grid-template-columns: 1fr;
+    }
+  }
   .skill-group {
     margin-bottom: 1.1rem;
   }
@@ -275,121 +308,117 @@
         <span class="term-dot green"></span>
         <span class="term-title">hubert@localhost</span>
       </div>
-      <pre class="term-body"><span class="term-prompt">$</span> whoami
-Hubert // builds tools at the intersection of
-infrastructure, storage, and security. It's the kind
-of work that means reading kernel source as often as
-application code. Recent projects range from a Linux
-kernel module for NFSv4 ACL handling to observability
-stacks and local-first privacy tooling. Python and Go
-are my daily drivers, with Kubernetes and Ansible
-running the infrastructure around them.
+      <div class="term-inner">
+        <div id="term-output" class="term-body"></div>
+        <noscript>
+          <div class="term-body"><span class="term-prompt">$</span> whoami
+Hubert. I build tools at the intersection of infrastructure, storage, and security. It's the kind of work that means reading kernel source as often as application code. Recent projects range from a Linux kernel module for NFSv4 ACL handling to observability stacks and local-first privacy tooling. Python and Go are my daily drivers, with Kubernetes and Ansible running the infrastructure around them.
 
-I like understanding how a system actually behaves
-under the hood, then building something small and
-sharp instead of something bloated. Always happy to
-collaborate on Python, Go, or Java projects with that
-same mindset.
+I like understanding how a system actually behaves under the hood, then building something small and sharp instead of something bloated. Always happy to collaborate on Python, Go, or Java projects with that same mindset.
 
 <span class="term-prompt">$</span> echo $STACK
-kubernetes python golang ansible bpf</pre>
-    </div>
-
-    <div class="card">
-      <h2>Skills</h2>
-      <div class="skill-group">
-        <h3>Kubernetes &amp; Orchestration</h3>
-        <div class="chips">
-          <span class="chip">Kubernetes (CKA)</span>
-          <span class="chip">Cilium</span>
-          <span class="chip">Calico</span>
-          <span class="chip">Multus (CNI)</span>
-          <span class="chip">Portworx</span>
-          <span class="chip">NetApp</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <h3>Storage &amp; Networking</h3>
-        <div class="chips">
-          <span class="chip">NFSv4.1</span>
-          <span class="chip">NFSv4.2</span>
-          <span class="chip">Kerberos-secured NFS</span>
-          <span class="chip">HPC / air-gapped clusters</span>
-          <span class="chip">DNS</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <h3>Infrastructure &amp; Automation</h3>
-        <div class="chips">
-          <span class="chip">Terraform</span>
-          <span class="chip">Jenkins</span>
-          <span class="chip">AWX</span>
-          <span class="chip">Golang</span>
-          <span class="chip">Python</span>
-          <span class="chip">Bash</span>
-          <span class="chip">PowerShell</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <h3>Observability</h3>
-        <div class="chips">
-          <span class="chip">Grafana</span>
-          <span class="chip">Prometheus</span>
-          <span class="chip">OpenTelemetry</span>
-          <span class="chip">VictoriaMetrics</span>
-          <span class="chip">ELK stack</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <h3>K8s Controller Development</h3>
-        <p>Authoring and maintaining custom Kubernetes controllers/operators in Golang, plus Helm chart authoring, versioning, and amendments for in-house and third-party controllers across the stack.</p>
-      </div>
-      <div class="skill-group">
-        <h3>AI-Assisted Engineering</h3>
-        <p>Daily use of Claude Code and MCP-based tooling for infrastructure automation.</p>
+kubernetes python golang ansible bpf</div>
+        </noscript>
       </div>
     </div>
 
-    <div class="card">
-      <div class="section-tabs">
-        <h2>Projects</h2>
-        <span class="tab-disabled">Blog <span class="badge">Coming soon</span></span>
+    <div class="two-col">
+      <div class="card">
+        <h2>Skills</h2>
+        <div class="skill-group">
+          <h3>Kubernetes &amp; Orchestration</h3>
+          <div class="chips">
+            <span class="chip">Kubernetes (CKA)</span>
+            <span class="chip">Cilium</span>
+            <span class="chip">Calico</span>
+            <span class="chip">Multus (CNI)</span>
+            <span class="chip">Portworx</span>
+            <span class="chip">NetApp</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Storage &amp; Networking</h3>
+          <div class="chips">
+            <span class="chip">NFSv4.1</span>
+            <span class="chip">NFSv4.2</span>
+            <span class="chip">Kerberos-secured NFS</span>
+            <span class="chip">HPC / air-gapped clusters</span>
+            <span class="chip">DNS</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Infrastructure &amp; Automation</h3>
+          <div class="chips">
+            <span class="chip">Terraform</span>
+            <span class="chip">Jenkins</span>
+            <span class="chip">AWX</span>
+            <span class="chip">Golang</span>
+            <span class="chip">Python</span>
+            <span class="chip">Bash</span>
+            <span class="chip">PowerShell</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>Observability</h3>
+          <div class="chips">
+            <span class="chip">Grafana</span>
+            <span class="chip">Prometheus</span>
+            <span class="chip">OpenTelemetry</span>
+            <span class="chip">VictoriaMetrics</span>
+            <span class="chip">ELK stack</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>K8s Controller Development</h3>
+          <p>Authoring and maintaining custom Kubernetes controllers/operators in Golang, plus Helm chart authoring, versioning, and amendments for in-house and third-party controllers across the stack.</p>
+        </div>
+        <div class="skill-group">
+          <h3>AI-Assisted Engineering</h3>
+          <p>Daily use of Claude Code and MCP-based tooling for infrastructure automation.</p>
+        </div>
       </div>
-      <div class="projects">
-        <div class="project">
-          <div class="project-head">
-            <a href="https://github.com/HubDamian95/omniscan">omniscan</a>
-            <span class="lang">Python</span>
-          </div>
-          <p>A unified OSINT CLI that aggregates open-source intelligence tools (Sherlock, Holehe, Maigret, GHunt, PhoneInfoga) behind one interface, letting you scan a username, email, or phone number across thousands of sites with a single command instead of juggling separate tools.</p>
+
+      <div class="card">
+        <div class="section-tabs">
+          <h2>Projects</h2>
+          <span class="tab-disabled">Blog <span class="badge">Coming soon</span></span>
         </div>
-        <div class="project">
-          <div class="project-head">
-            <a href="https://github.com/HubDamian95/nfs">nfs</a>
-            <span class="lang">C</span>
+        <div class="projects">
+          <div class="project">
+            <div class="project-head">
+              <a href="https://github.com/HubDamian95/omniscan">omniscan</a>
+              <span class="lang">Python</span>
+            </div>
+            <p>A unified OSINT CLI that aggregates open-source intelligence tools (Sherlock, Holehe, Maigret, GHunt, PhoneInfoga) behind one interface, letting you scan a username, email, or phone number across thousands of sites with a single command instead of juggling separate tools.</p>
           </div>
-          <p>Low-level Linux kernel tooling for NFSv4: a kernel module that invalidates a file's cached ACL, and a bpftrace script that live-traces NFSv4 GET_FACL calls at the kernel probe level. Storage/networking internals work.</p>
-        </div>
-        <div class="project">
-          <div class="project-head">
-            <a href="https://github.com/HubDamian95/check-global-websites-grafana-prometheus">check-global-websites-grafana-prometheus</a>
-            <span class="lang">Monitoring</span>
+          <div class="project">
+            <div class="project-head">
+              <a href="https://github.com/HubDamian95/nfs">nfs</a>
+              <span class="lang">C</span>
+            </div>
+            <p>Low-level Linux kernel tooling for NFSv4: a kernel module that invalidates a file's cached ACL, and a bpftrace script that live-traces NFSv4 GET_FACL calls at the kernel probe level. Storage/networking internals work.</p>
           </div>
-          <p>A ready-to-deploy observability stack: Prometheus + Blackbox Exporter + Grafana tracking ICMP and HTTP latency for 25+ global targets on a live world heatmap, with install scripts to stand it up on Ubuntu/Debian in under 10 minutes.</p>
-        </div>
-        <div class="project">
-          <div class="project-head">
-            <a href="https://github.com/HubDamian95/whisperstash">whisperstash</a>
-            <span class="lang">Python</span>
+          <div class="project">
+            <div class="project-head">
+              <a href="https://github.com/HubDamian95/check-global-websites-grafana-prometheus">check-global-websites-grafana-prometheus</a>
+              <span class="lang">Monitoring</span>
+            </div>
+            <p>A ready-to-deploy observability stack: Prometheus + Blackbox Exporter + Grafana tracking ICMP and HTTP latency for 25+ global targets on a live world heatmap, with install scripts to stand it up on Ubuntu/Debian in under 10 minutes.</p>
           </div>
-          <p>Local-first encryption toolkit for sharing private text and files via a shared key. Includes a CLI, a local browser UI, and a Chrome extension backed by a localhost daemon. No cloud backend; everything stays on-device.</p>
-        </div>
-        <div class="project">
-          <div class="project-head">
-            <a href="https://github.com/HubDamian95/ollama-voice-to-cli">ollama-voice-to-cli</a>
-            <span class="lang">Python</span>
+          <div class="project">
+            <div class="project-head">
+              <a href="https://github.com/HubDamian95/whisperstash">whisperstash</a>
+              <span class="lang">Python</span>
+            </div>
+            <p>Local-first encryption toolkit for sharing private text and files via a shared key. Includes a CLI, a local browser UI, and a Chrome extension backed by a localhost daemon. No cloud backend; everything stays on-device.</p>
           </div>
-          <p>Hands-free voice interface for a local Ollama model: Silero VAD detects speech automatically, faster-whisper transcribes it locally, and responses are streamed to the terminal and spoken aloud. Fully local, no cloud APIs.</p>
+          <div class="project">
+            <div class="project-head">
+              <a href="https://github.com/HubDamian95/ollama-voice-to-cli">ollama-voice-to-cli</a>
+              <span class="lang">Python</span>
+            </div>
+            <p>Hands-free voice interface for a local Ollama model: Silero VAD detects speech automatically, faster-whisper transcribes it locally, and responses are streamed to the terminal and spoken aloud. Fully local, no cloud APIs.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -405,5 +434,79 @@ kubernetes python golang ansible bpf</pre>
 
     <footer>Built and hosted with GitHub Pages.</footer>
   </div>
+
+  <script>
+  (function () {
+    var target = document.getElementById('term-output');
+    if (!target) return;
+
+    var script = [
+      { type: 'cmd', text: 'whoami' },
+      { type: 'out', text: "Hubert. I build tools at the intersection of infrastructure, storage, and security. It's the kind of work that means reading kernel source as often as application code. Recent projects range from a Linux kernel module for NFSv4 ACL handling to observability stacks and local-first privacy tooling. Python and Go are my daily drivers, with Kubernetes and Ansible running the infrastructure around them.\n\nI like understanding how a system actually behaves under the hood, then building something small and sharp instead of something bloated. Always happy to collaborate on Python, Go, or Java projects with that same mindset." },
+      { type: 'cmd', text: 'echo $STACK' },
+      { type: 'out', text: 'kubernetes python golang ansible bpf' }
+    ];
+
+    var cmdSpeed = 42;
+    var outSpeed = 5;
+    var pauseAfterCmd = 300;
+    var pauseAfterOut = 450;
+
+    function makeCursor() {
+      var c = document.createElement('span');
+      c.className = 'term-cursor';
+      c.textContent = '█';
+      return c;
+    }
+
+    function typeInto(container, text, speed, done) {
+      var cursor = makeCursor();
+      container.appendChild(cursor);
+      var i = 0;
+      (function step() {
+        if (i < text.length) {
+          cursor.insertAdjacentText('beforebegin', text.charAt(i));
+          i++;
+          setTimeout(step, speed);
+        } else {
+          cursor.remove();
+          done();
+        }
+      })();
+    }
+
+    function runStep(idx) {
+      if (idx >= script.length) {
+        var finalLine = document.createElement('div');
+        var finalPrompt = document.createElement('span');
+        finalPrompt.className = 'term-prompt';
+        finalPrompt.textContent = '$ ';
+        finalLine.appendChild(finalPrompt);
+        finalLine.appendChild(makeCursor());
+        target.appendChild(finalLine);
+        return;
+      }
+      var item = script[idx];
+      var line = document.createElement('div');
+      if (item.type === 'cmd') {
+        var prompt = document.createElement('span');
+        prompt.className = 'term-prompt';
+        prompt.textContent = '$ ';
+        line.appendChild(prompt);
+        target.appendChild(line);
+        typeInto(line, item.text, cmdSpeed, function () {
+          setTimeout(function () { runStep(idx + 1); }, pauseAfterCmd);
+        });
+      } else {
+        target.appendChild(line);
+        typeInto(line, item.text, outSpeed, function () {
+          setTimeout(function () { runStep(idx + 1); }, pauseAfterOut);
+        });
+      }
+    }
+
+    runStep(0);
+  })();
+  </script>
 </body>
 </html>
