@@ -147,6 +147,26 @@
     color: var(--text-dim);
     font-size: 0.92rem;
   }
+  .soon-card {
+    border-style: dashed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .soon-card h2 {
+    margin: 0;
+  }
+  .badge {
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    white-space: nowrap;
+  }
   footer {
     text-align: center;
     color: var(--text-dim);
@@ -213,6 +233,11 @@
           <p>Hands-free voice interface for a local Ollama model: Silero VAD detects speech automatically, faster-whisper transcribes it locally, and responses are streamed to the terminal and spoken aloud &mdash; fully local, no cloud APIs.</p>
         </div>
       </div>
+    </div>
+
+    <div class="card soon-card">
+      <h2>Blog</h2>
+      <span class="badge">Coming soon</span>
     </div>
 
     <div class="card">
