@@ -35,7 +35,7 @@
     overflow-x: hidden;
   }
   .wrap {
-    max-width: 920px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 4rem 1.5rem 3rem;
   }
@@ -65,6 +65,8 @@
     color: var(--text-dim);
     font-size: 0.95rem;
   }
+
+  /* Layer 2: cards / panels -- used for project work */
   .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -79,12 +81,6 @@
     letter-spacing: 0.04em;
     color: var(--text-dim);
   }
-  ul {
-    margin: 0;
-    padding-left: 1.1rem;
-  }
-  li { margin-bottom: 0.5rem; }
-  li:last-child { margin-bottom: 0; }
   .links {
     display: flex;
     gap: 0.75rem;
@@ -109,7 +105,7 @@
     gap: 1rem;
   }
   .project {
-    background: var(--bg-card);
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 1.25rem 1.5rem;
@@ -178,6 +174,8 @@
     text-transform: none;
     letter-spacing: normal;
   }
+
+  /* Layer 1: terminal -- identity + introduction */
   .terminal {
     background: #0d1117;
     width: 100vw;
@@ -189,7 +187,6 @@
     margin-bottom: 1.75rem;
     border-top: 1px solid #30363d;
     border-bottom: 1px solid #30363d;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
   .term-bar {
     display: flex;
@@ -237,52 +234,143 @@
   @keyframes term-blink {
     50% { opacity: 0; }
   }
-  .two-col {
+
+  /* Featured project card */
+  .featured {
+    border-color: var(--accent);
+  }
+  .featured-title {
+    margin: 0 0 0.9rem;
+    font-size: 1.35rem;
+  }
+  .featured-rule {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0 0 1.1rem;
+  }
+  .featured p {
+    margin: 0 0 1.1rem;
+    color: var(--text-dim);
+  }
+  .feature-bullets {
+    list-style: none;
+    margin: 0 0 1.4rem;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.6rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .diagram-wrap {
+    overflow-x: auto;
+    margin: 0 0 1.4rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+  }
+  .diagram-wrap svg {
+    display: block;
+  }
+  .diagram text {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .diagram .caption {
+    fill: var(--text-dim);
+    font-size: 10.5px;
+  }
+  .diagram .label {
+    fill: var(--text-dim);
+    font-size: 11px;
+  }
+  .diagram .kspace {
+    fill: none;
+    stroke: var(--border);
+    stroke-dasharray: 4 4;
+  }
+  .diagram .node-base rect {
+    fill: var(--bg-card);
+    stroke: var(--border);
+    stroke-width: 1.3;
+  }
+  .diagram .node-base text {
+    fill: var(--text-dim);
+    font-size: 11.5px;
+  }
+  .diagram .node-accent rect {
+    fill: var(--accent-soft);
+    stroke: var(--accent);
+    stroke-width: 1.3;
+  }
+  .diagram .node-accent text {
+    fill: var(--accent);
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .diagram .arrow-dim {
+    stroke: var(--text-dim);
+    stroke-width: 1.3;
+    fill: none;
+  }
+  .diagram .arrow-accent {
+    stroke: var(--accent);
+    stroke-width: 1.3;
+    stroke-dasharray: 4 3;
+    fill: none;
+  }
+  .btn-primary {
+    display: inline-block;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover {
+    background: var(--accent-soft);
+  }
+
+  /* Layer 3: simple typography -- technical details */
+  .skills-plain {
+    margin-bottom: 1.75rem;
+  }
+  .skills-plain h2 {
+    margin: 0 0 1.1rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-dim);
+  }
+  .spec-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-    align-items: start;
-    margin-bottom: 1.25rem;
+    grid-template-columns: 220px 1fr;
+    row-gap: 0.9rem;
+    column-gap: 1.5rem;
   }
-  .two-col .card {
-    margin-bottom: 0;
-  }
-  @media (max-width: 760px) {
-    .two-col {
-      grid-template-columns: 1fr;
-    }
-  }
-  .skill-group {
-    margin-bottom: 1.1rem;
-  }
-  .skill-group:last-child {
-    margin-bottom: 0;
-  }
-  .skill-group h3 {
-    margin: 0 0 0.55rem;
-    font-size: 0.88rem;
+  .spec-grid dt {
     font-weight: 600;
     color: var(--text);
+    font-size: 0.92rem;
   }
-  .skill-group p {
+  .spec-grid dd {
     margin: 0;
     color: var(--text-dim);
     font-size: 0.92rem;
   }
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+  @media (max-width: 640px) {
+    .spec-grid {
+      grid-template-columns: 1fr;
+      row-gap: 0.25rem;
+    }
+    .spec-grid dd {
+      margin-bottom: 0.75rem;
+    }
   }
-  .chip {
-    font-size: 0.82rem;
-    color: var(--text);
-    background: var(--accent-soft);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.28rem 0.65rem;
-    white-space: nowrap;
-  }
+
   footer {
     text-align: center;
     color: var(--text-dim);
@@ -312,7 +400,7 @@
         <div id="term-output" class="term-body"></div>
         <noscript>
           <div class="term-body"><span class="term-prompt">$</span> whoami
-Hubert. I build tools at the intersection of infrastructure, storage, and security. It's the kind of work that means reading kernel source as often as application code. Recent projects range from a Linux kernel module for NFSv4 ACL handling to observability stacks and local-first privacy tooling. Python and Go are my daily drivers, with Kubernetes and Ansible running the infrastructure around them.
+Hubert. I build tools at the intersection of infrastructure, storage, and security. It's the kind of work that means reading kernel source as often as application code, day to day with CRI-O, cgroups, and the container runtime stack underneath Kubernetes. Recent projects range from a Linux kernel module for NFSv4 ACL handling to observability stacks and local-first privacy tooling. Python and Go are my daily drivers, with Kubernetes and Ansible running the infrastructure around them.
 
 I like understanding how a system actually behaves under the hood, then building something small and sharp instead of something bloated. Always happy to collaborate on Python, Go, or Java projects with that same mindset.
 
@@ -322,105 +410,148 @@ kubernetes python golang ansible bpf</div>
       </div>
     </div>
 
-    <div class="two-col">
-      <div class="card">
-        <h2>Skills</h2>
-        <div class="skill-group">
-          <h3>Kubernetes &amp; Orchestration</h3>
-          <div class="chips">
-            <span class="chip">Kubernetes (CKA)</span>
-            <span class="chip">Cilium</span>
-            <span class="chip">Calico</span>
-            <span class="chip">Multus (CNI)</span>
-            <span class="chip">Portworx</span>
-            <span class="chip">NetApp</span>
-          </div>
-        </div>
-        <div class="skill-group">
-          <h3>Storage &amp; Networking</h3>
-          <div class="chips">
-            <span class="chip">NFSv4.1</span>
-            <span class="chip">NFSv4.2</span>
-            <span class="chip">Kerberos-secured NFS</span>
-            <span class="chip">HPC / air-gapped clusters</span>
-            <span class="chip">DNS</span>
-          </div>
-        </div>
-        <div class="skill-group">
-          <h3>Infrastructure &amp; Automation</h3>
-          <div class="chips">
-            <span class="chip">Terraform</span>
-            <span class="chip">Jenkins</span>
-            <span class="chip">AWX</span>
-            <span class="chip">Golang</span>
-            <span class="chip">Python</span>
-            <span class="chip">Bash</span>
-            <span class="chip">PowerShell</span>
-          </div>
-        </div>
-        <div class="skill-group">
-          <h3>Observability</h3>
-          <div class="chips">
-            <span class="chip">Grafana</span>
-            <span class="chip">Prometheus</span>
-            <span class="chip">OpenTelemetry</span>
-            <span class="chip">VictoriaMetrics</span>
-            <span class="chip">ELK stack</span>
-          </div>
-        </div>
-        <div class="skill-group">
-          <h3>K8s Controller Development</h3>
-          <p>Authoring and maintaining custom Kubernetes controllers/operators in Golang, plus Helm chart authoring, versioning, and amendments for in-house and third-party controllers across the stack.</p>
-        </div>
-        <div class="skill-group">
-          <h3>AI-Assisted Engineering</h3>
-          <p>Daily use of Claude Code and MCP-based tooling for infrastructure automation.</p>
-        </div>
+    <div class="card featured">
+      <h2>Featured work</h2>
+      <h3 class="featured-title">NFSv4 ACL Cache Invalidation</h3>
+      <hr class="featured-rule">
+      <p>
+        I needed to understand why an NFSv4 client kept enforcing a stale ACL after a permission change on the
+        server, with no clean way to force it to re-fetch. So I wrote a small Linux kernel module that flushes
+        the cached ACL for a given path on demand, and a companion bpftrace script that hooks the client's
+        GET_FACL call to trace every ACL fetch live, instead of guessing from behaviour.
+      </p>
+      <ul class="feature-bullets">
+        <li>&#8594; Linux kernel module</li>
+        <li>&#8594; NFSv4.1 / NFSv4.2</li>
+        <li>&#8594; bpftrace</li>
+        <li>&#8594; kernel-level tracing</li>
+      </ul>
+
+      <div class="diagram-wrap">
+        <svg class="diagram" width="760" height="300" viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of the NFSv4 client kernel path, showing the bpftrace probe attached to nfs4_proc_get_acl and the kernel module that flushes the ACL cache">
+          <defs>
+            <marker id="arrow-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--text-dim)"></path>
+            </marker>
+            <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"></path>
+            </marker>
+          </defs>
+
+          <rect class="kspace" x="40" y="55" width="440" height="150" rx="8"></rect>
+          <text class="caption" x="52" y="45">NFS client (kernel space)</text>
+
+          <g class="node-base">
+            <rect x="60" y="105" width="90" height="50" rx="6"></rect>
+            <text x="105" y="134" text-anchor="middle">VFS</text>
+          </g>
+
+          <g class="node-base">
+            <rect x="170" y="105" width="170" height="50" rx="6"></rect>
+            <text x="255" y="134" text-anchor="middle">nfs4_proc_get_acl()</text>
+          </g>
+
+          <g class="node-base">
+            <rect x="360" y="105" width="100" height="50" rx="6"></rect>
+            <text x="410" y="125" text-anchor="middle">ACL cache</text>
+            <text x="410" y="140" text-anchor="middle">(posix_acl)</text>
+          </g>
+
+          <g class="node-base">
+            <rect x="600" y="105" width="130" height="50" rx="6"></rect>
+            <text x="665" y="134" text-anchor="middle">NFS server</text>
+          </g>
+
+          <path class="arrow-dim" d="M150,130 L166,130" marker-end="url(#arrow-dim)"></path>
+          <path class="arrow-dim" d="M340,130 L356,130" marker-end="url(#arrow-dim)"></path>
+          <path class="arrow-dim" d="M460,130 L596,130" marker-end="url(#arrow-dim)"></path>
+          <text class="label" x="530" y="118" text-anchor="middle">NFSv4.1/4.2 (Kerberos)</text>
+
+          <g class="node-accent">
+            <rect x="180" y="15" width="150" height="42" rx="6"></rect>
+            <text x="255" y="40" text-anchor="middle">bpftrace kprobe</text>
+          </g>
+          <path class="arrow-accent" d="M255,57 L255,101" marker-end="url(#arrow-accent)"></path>
+          <text class="label" x="265" y="82">traces every ACL fetch</text>
+
+          <g class="node-accent">
+            <rect x="345" y="215" width="170" height="50" rx="6"></rect>
+            <text x="430" y="235" text-anchor="middle">kernel module</text>
+            <text x="430" y="250" text-anchor="middle">nfs_acl_flush()</text>
+          </g>
+          <path class="arrow-accent" d="M420,215 L412,159" marker-end="url(#arrow-accent)"></path>
+          <text class="label" x="438" y="197">flushes cache for path</text>
+
+          <text class="caption" x="40" y="290">Accent = what I built &#183; gray = existing NFS/kernel stack</text>
+        </svg>
       </div>
 
-      <div class="card">
-        <div class="section-tabs">
-          <h2>Projects</h2>
-          <span class="tab-disabled">Blog <span class="badge">Coming soon</span></span>
+      <div>
+        <a class="btn-primary" href="https://github.com/HubDamian95/nfs">View on GitHub</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-tabs">
+        <h2>Projects</h2>
+        <span class="tab-disabled">Blog <span class="badge">Coming soon</span></span>
+      </div>
+      <div class="projects">
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/omniscan">omniscan</a>
+            <span class="lang">Python</span>
+          </div>
+          <p>A unified OSINT CLI that aggregates open-source intelligence tools (Sherlock, Holehe, Maigret, GHunt, PhoneInfoga) behind one interface, letting you scan a username, email, or phone number across thousands of sites with a single command instead of juggling separate tools.</p>
         </div>
-        <div class="projects">
-          <div class="project">
-            <div class="project-head">
-              <a href="https://github.com/HubDamian95/omniscan">omniscan</a>
-              <span class="lang">Python</span>
-            </div>
-            <p>A unified OSINT CLI that aggregates open-source intelligence tools (Sherlock, Holehe, Maigret, GHunt, PhoneInfoga) behind one interface, letting you scan a username, email, or phone number across thousands of sites with a single command instead of juggling separate tools.</p>
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/check-global-websites-grafana-prometheus">check-global-websites-grafana-prometheus</a>
+            <span class="lang">Monitoring</span>
           </div>
-          <div class="project">
-            <div class="project-head">
-              <a href="https://github.com/HubDamian95/nfs">nfs</a>
-              <span class="lang">C</span>
-            </div>
-            <p>Low-level Linux kernel tooling for NFSv4: a kernel module that invalidates a file's cached ACL, and a bpftrace script that live-traces NFSv4 GET_FACL calls at the kernel probe level. Storage/networking internals work.</p>
+          <p>A ready-to-deploy observability stack: Prometheus + Blackbox Exporter + Grafana tracking ICMP and HTTP latency for 25+ global targets on a live world heatmap, with install scripts to stand it up on Ubuntu/Debian in under 10 minutes.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/whisperstash">whisperstash</a>
+            <span class="lang">Python</span>
           </div>
-          <div class="project">
-            <div class="project-head">
-              <a href="https://github.com/HubDamian95/check-global-websites-grafana-prometheus">check-global-websites-grafana-prometheus</a>
-              <span class="lang">Monitoring</span>
-            </div>
-            <p>A ready-to-deploy observability stack: Prometheus + Blackbox Exporter + Grafana tracking ICMP and HTTP latency for 25+ global targets on a live world heatmap, with install scripts to stand it up on Ubuntu/Debian in under 10 minutes.</p>
+          <p>Local-first encryption toolkit for sharing private text and files via a shared key. Includes a CLI, a local browser UI, and a Chrome extension backed by a localhost daemon. No cloud backend; everything stays on-device.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="https://github.com/HubDamian95/ollama-voice-to-cli">ollama-voice-to-cli</a>
+            <span class="lang">Python</span>
           </div>
-          <div class="project">
-            <div class="project-head">
-              <a href="https://github.com/HubDamian95/whisperstash">whisperstash</a>
-              <span class="lang">Python</span>
-            </div>
-            <p>Local-first encryption toolkit for sharing private text and files via a shared key. Includes a CLI, a local browser UI, and a Chrome extension backed by a localhost daemon. No cloud backend; everything stays on-device.</p>
-          </div>
-          <div class="project">
-            <div class="project-head">
-              <a href="https://github.com/HubDamian95/ollama-voice-to-cli">ollama-voice-to-cli</a>
-              <span class="lang">Python</span>
-            </div>
-            <p>Hands-free voice interface for a local Ollama model: Silero VAD detects speech automatically, faster-whisper transcribes it locally, and responses are streamed to the terminal and spoken aloud. Fully local, no cloud APIs.</p>
-          </div>
+          <p>Hands-free voice interface for a local Ollama model: Silero VAD detects speech automatically, faster-whisper transcribes it locally, and responses are streamed to the terminal and spoken aloud. Fully local, no cloud APIs.</p>
         </div>
       </div>
+    </div>
+
+    <div class="skills-plain">
+      <h2>Skills</h2>
+      <dl class="spec-grid">
+        <dt>Kubernetes &amp; Orchestration</dt>
+        <dd>Kubernetes (CKA), Cilium, Calico, Multus (CNI), Portworx, NetApp</dd>
+
+        <dt>Storage &amp; Networking</dt>
+        <dd>NFSv4.1, NFSv4.2, Kerberos-secured NFS, HPC / air-gapped clusters, DNS</dd>
+
+        <dt>Kernel &amp; Container Runtime</dt>
+        <dd>CRI-O, cgroups, kernel modules, bpftrace</dd>
+
+        <dt>Infrastructure &amp; Automation</dt>
+        <dd>Terraform, Jenkins, AWX, Golang, Python, Bash, PowerShell</dd>
+
+        <dt>Observability</dt>
+        <dd>Grafana, Prometheus, OpenTelemetry, VictoriaMetrics, ELK stack</dd>
+
+        <dt>K8s Controller Development</dt>
+        <dd>Authoring and maintaining custom Kubernetes controllers/operators in Golang, plus Helm chart authoring, versioning, and amendments for in-house and third-party controllers across the stack.</dd>
+
+        <dt>AI-Assisted Engineering</dt>
+        <dd>Daily use of Claude Code and MCP-based tooling for infrastructure automation.</dd>
+      </dl>
     </div>
 
     <div class="card">
@@ -442,7 +573,7 @@ kubernetes python golang ansible bpf</div>
 
     var script = [
       { type: 'cmd', text: 'whoami' },
-      { type: 'out', text: "Hubert. I build tools at the intersection of infrastructure, storage, and security. It's the kind of work that means reading kernel source as often as application code. Recent projects range from a Linux kernel module for NFSv4 ACL handling to observability stacks and local-first privacy tooling. Python and Go are my daily drivers, with Kubernetes and Ansible running the infrastructure around them.\n\nI like understanding how a system actually behaves under the hood, then building something small and sharp instead of something bloated. Always happy to collaborate on Python, Go, or Java projects with that same mindset." },
+      { type: 'out', text: "Hubert. I build tools at the intersection of infrastructure, storage, and security. It's the kind of work that means reading kernel source as often as application code, day to day with CRI-O, cgroups, and the container runtime stack underneath Kubernetes. Recent projects range from a Linux kernel module for NFSv4 ACL handling to observability stacks and local-first privacy tooling. Python and Go are my daily drivers, with Kubernetes and Ansible running the infrastructure around them.\n\nI like understanding how a system actually behaves under the hood, then building something small and sharp instead of something bloated. Always happy to collaborate on Python, Go, or Java projects with that same mindset." },
       { type: 'cmd', text: 'echo $STACK' },
       { type: 'out', text: 'kubernetes python golang ansible bpf' }
     ];
