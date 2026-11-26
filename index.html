@@ -410,6 +410,33 @@ kubernetes python golang ansible bpf</div>
       </div>
     </div>
 
+    <div class="card">
+      <h2>Upstream Linux NFS write-ups</h2>
+      <div class="projects">
+        <div class="project">
+          <div class="project-head">
+            <a href="writeups/sunrpc-credcache-shrinker-race.html">A NULL pointer in the SUNRPC cred shrinker</a>
+            <span class="lang">Linux kernel</span>
+          </div>
+          <p>A pointer cleared without a lock let the memory shrinker take a spinlock at address 0xc and crash kswapd. How the NULL was traced to a teardown race, and the fix.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="writeups/gssd-stale-machine-ccache.html">gssd said "good until" while every upcall failed</a>
+            <span class="lang">nfs-utils</span>
+          </div>
+          <p>gssd trusted its own cached endtime instead of the Kerberos ticket cache. Why that broke when another writer replaced the file, and the fix.</p>
+        </div>
+        <div class="project">
+          <div class="project-head">
+            <a href="writeups/gss-au-flags-uninitialized.html">One uninitialized field, one wrong RDMA chunk</a>
+            <span class="lang">Linux kernel</span>
+          </div>
+          <p>Leftover slab bits in a GSS auth struct made large RPC/RDMA reads use a reply chunk instead of a write chunk, sometimes. A one-line fix.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="card featured">
       <h2>Featured work</h2>
       <h3 class="featured-title">NFSv4 ACL Cache Invalidation</h3>
@@ -488,33 +515,6 @@ kubernetes python golang ansible bpf</div>
 
       <div>
         <a class="btn-primary" href="https://github.com/HubDamian95/nfs">View on GitHub</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Upstream Linux NFS write-ups</h2>
-      <div class="projects">
-        <div class="project">
-          <div class="project-head">
-            <a href="writeups/sunrpc-credcache-shrinker-race.html">A NULL pointer in the SUNRPC cred shrinker</a>
-            <span class="lang">Linux kernel</span>
-          </div>
-          <p>A pointer cleared without a lock let the memory shrinker take a spinlock at address 0xc and crash kswapd. How the NULL was traced to a teardown race, and the fix.</p>
-        </div>
-        <div class="project">
-          <div class="project-head">
-            <a href="writeups/gssd-stale-machine-ccache.html">gssd said "good until" while every upcall failed</a>
-            <span class="lang">nfs-utils</span>
-          </div>
-          <p>gssd trusted its own cached endtime instead of the Kerberos ticket cache. Why that broke when another writer replaced the file, and the fix.</p>
-        </div>
-        <div class="project">
-          <div class="project-head">
-            <a href="writeups/gss-au-flags-uninitialized.html">One uninitialized field, one wrong RDMA chunk</a>
-            <span class="lang">Linux kernel</span>
-          </div>
-          <p>Leftover slab bits in a GSS auth struct made large RPC/RDMA reads use a reply chunk instead of a write chunk, sometimes. A one-line fix.</p>
-        </div>
       </div>
     </div>
 
