@@ -444,8 +444,9 @@ kubernetes python golang ansible bpf</div>
       <p>
         I needed to understand why an NFSv4 client kept enforcing a stale ACL after a permission change on the
         server, with no clean way to force it to re-fetch. So I wrote a small Linux kernel module that flushes
-        the cached ACL for a given path on demand, and a companion bpftrace script that hooks the client's
-        GET_FACL call to trace every ACL fetch live, instead of guessing from behaviour.
+        the cached ACL for a given path on demand, and a companion bpftrace script that traces every ACL read
+        and shows whether it was answered from the cache or fetched from the server, instead of guessing from
+        behaviour.
       </p>
       <ul class="feature-bullets">
         <li>&#8594; Linux kernel module</li>
@@ -481,7 +482,7 @@ kubernetes python golang ansible bpf</div>
           <g class="node-base">
             <rect x="360" y="105" width="100" height="50" rx="6"></rect>
             <text x="410" y="125" text-anchor="middle">ACL cache</text>
-            <text x="410" y="140" text-anchor="middle">(posix_acl)</text>
+            <text x="410" y="140" text-anchor="middle">(nfs4_acl)</text>
           </g>
 
           <g class="node-base">
@@ -492,19 +493,19 @@ kubernetes python golang ansible bpf</div>
           <path class="arrow-dim" d="M150,130 L166,130" marker-end="url(#arrow-dim)"></path>
           <path class="arrow-dim" d="M340,130 L356,130" marker-end="url(#arrow-dim)"></path>
           <path class="arrow-dim" d="M460,130 L596,130" marker-end="url(#arrow-dim)"></path>
-          <text class="label" x="530" y="118" text-anchor="middle">NFSv4.1/4.2 (Kerberos)</text>
+          <text class="label" x="530" y="118" text-anchor="middle">NFSv4.1/4.2</text>
 
           <g class="node-accent">
             <rect x="180" y="15" width="150" height="42" rx="6"></rect>
-            <text x="255" y="40" text-anchor="middle">bpftrace kprobe</text>
+            <text x="255" y="40" text-anchor="middle">bpftrace probes</text>
           </g>
           <path class="arrow-accent" d="M255,57 L255,101" marker-end="url(#arrow-accent)"></path>
-          <text class="label" x="265" y="82">traces every ACL fetch</text>
+          <text class="label" x="265" y="82">traces reads + server fetches</text>
 
           <g class="node-accent">
             <rect x="345" y="215" width="170" height="50" rx="6"></rect>
             <text x="430" y="235" text-anchor="middle">kernel module</text>
-            <text x="430" y="250" text-anchor="middle">nfs_acl_flush()</text>
+            <text x="430" y="250" text-anchor="middle">nfs_zap_acl_cache()</text>
           </g>
           <path class="arrow-accent" d="M420,215 L412,159" marker-end="url(#arrow-accent)"></path>
           <text class="label" x="438" y="197">flushes cache for path</text>
@@ -519,10 +520,7 @@ kubernetes python golang ansible bpf</div>
     </div>
 
     <div class="card">
-      <div class="section-tabs">
-        <h2>Projects</h2>
-        <span class="tab-disabled">Blog <span class="badge">Coming soon</span></span>
-      </div>
+      <h2>Projects</h2>
       <div class="projects">
         <div class="project">
           <div class="project-head">
