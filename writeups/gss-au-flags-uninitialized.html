@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One uninitialized field, one wrong RDMA chunk - Hubert Damian</title>
+<meta name="description" content="Leftover slab bits in a kernel struct made RPC/RDMA send large reads the slow way, sometimes. A one-line fix and why it was hard to see.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">&larr; hubdamian95.github.io</a>
+
+  <div class="meta">
+    <span class="tag">Linux kernel</span>
+    <span class="tag">sunrpc / auth_gss</span>
+    <span class="tag">RPC/RDMA</span>
+    <span class="tag status">Submitted upstream, under review</span>
+  </div>
+  <h1>One uninitialized field, one wrong RDMA chunk</h1>
+  <p class="lede">Why a large NFS read over RDMA sometimes went out the slow way, and why it only happened sometimes.</p>
+
+  <h2>The symptom</h2>
+  <p>Over RPC/RDMA, a large READ on plain <code>krb5</code> was sometimes sent with a <strong>reply chunk</strong> instead of a <strong>write chunk</strong>, even though a write chunk was all it needed. Same mount, same flavor, different behavior from one client run to another. Non-deterministic behavior of that kind usually points at uninitialized memory.</p>
+
+  <h2>Why it mattered</h2>
+  <p><code>rpcrdma_marshal_req()</code> looks at a bit in the auth flags, <code>RPCAUTH_AUTH_DATATOUCH</code>, and reads it as "this GSS flavor must not place payload bytes directly". For integrity and privacy flavors (<code>krb5i</code>, <code>krb5p</code>) that is true, because the payload has to be checksummed or encrypted, so the data cannot be written straight into the application buffer. For plain <code>krb5</code> it is false, and the read should use a write chunk.</p>
+
+  <h2>Where the bit came from</h2>
+  <p><code>gss_create_new()</code> gets its <code>struct gss_auth</code> from <code>kmalloc()</code>, which does <em>not</em> zero memory, and then sets flags only with <code>__set_bit()</code>:</p>
+  <ul>
+    <li><code>RPCAUTH_AUTH_UPDATE_SLACK</code> is set on every GSS auth.</li>
+    <li><code>RPCAUTH_AUTH_DATATOUCH</code> is set only for <code>krb5i</code> and <code>krb5p</code>.</li>
+  </ul>
+  <p><code>__set_bit()</code> only turns a bit on and leaves every other bit alone. Nothing ever stored a clean value into <code>au_flags</code>. So whatever the slab allocator handed back, bit for bit, was the starting state.</p>
+
+  <div class="callout bad">
+    <p>If that memory previously held a structure whose <code>DATATOUCH</code> bit position was set, a plain <code>krb5</code> auth inherited it, on kernels that do not zero allocations. Whether it happened depended on what had lived at that address before.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" width="740" height="150" viewBox="0 0 740 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flow from kmalloc returning stale slab memory with a leftover DATATOUCH bit, through __set_bit which only adds bits, to rpcrdma_marshal_req choosing a reply chunk.">
+      <g class="step">
+        <rect x="20" y="40" width="150" height="52" rx="6"/>
+        <text x="95" y="62" text-anchor="middle">kmalloc()</text>
+        <text x="95" y="78" text-anchor="middle">not zeroed</text>
+      </g>
+      <g class="step hot">
+        <rect x="210" y="40" width="160" height="52" rx="6"/>
+        <text x="290" y="62" text-anchor="middle">au_flags holds</text>
+        <text x="290" y="78" text-anchor="middle">stale DATATOUCH</text>
+      </g>
+      <g class="step">
+        <rect x="410" y="40" width="130" height="52" rx="6"/>
+        <text x="475" y="62" text-anchor="middle">__set_bit()</text>
+        <text x="475" y="78" text-anchor="middle">only adds bits</text>
+      </g>
+      <g class="step hot">
+        <rect x="580" y="40" width="140" height="52" rx="6"/>
+        <text x="650" y="62" text-anchor="middle">reply chunk</text>
+        <text x="650" y="78" text-anchor="middle">for large READ</text>
+      </g>
+      <path class="time" d="M170,66 L206,66"/>
+      <path class="time" d="M370,66 L406,66"/>
+      <path class="time" d="M540,66 L576,66"/>
+      <text x="20" y="130">Plain krb5 should clear DATATOUCH. Nothing ever cleared it.</text>
+    </svg>
+  </div>
+
+  <h2>The fix</h2>
+<pre><code>     auth-&gt;au_rslack = GSS_KRB5_MAX_SLACK_NEEDED &gt;&gt; 2;
+     auth-&gt;au_verfsize = GSS_VERF_SLACK &gt;&gt; 2;
+     auth-&gt;au_ralign = GSS_VERF_SLACK &gt;&gt; 2;
+<span class="add">+    auth-&gt;au_flags = 0;</span>
+     __set_bit(RPCAUTH_AUTH_UPDATE_SLACK, &amp;auth-&gt;au_flags);</code></pre>
+  <p>One line. The alternative was to switch the allocation to <code>kzalloc()</code>, which would zero the whole struct. The patch instead initializes the field explicitly, to stay aligned with how the surrounding fields are already initialized one by one.</p>
+
+  <h2>Lessons</h2>
+  <ul>
+    <li><strong>Bit helpers are not initializers.</strong> <code>__set_bit()</code> and <code>set_bit()</code> assume the word already has a defined value.</li>
+    <li><strong>"Sometimes" is a clue.</strong> A flag that depends on flavor but misbehaves intermittently on <em>one</em> flavor looks like state the code never set, not logic it set wrongly.</li>
+    <li><strong>The consumer can be far from the bug.</strong> The wrong value was written in <code>auth_gss</code> and only became visible as a different chunk choice in the RDMA transport.</li>
+  </ul>
+
+  <div class="sources">
+    <p>Patch: <a href="https://lore.kernel.org/all/20261124130027.1432127-1-dan.aloni@vastdata.com/">[PATCH] sunrpc: fix for missing initialization of GSS au_flags</a> (linux-nfs, 24 Nov 2026). Worked on with the VAST Data team, who submitted it upstream. Status: submitted, under review.</p>
+  </div>
+
+  <footer>Built and hosted with GitHub Pages.</footer>
+</div>
+</body>
+</html>

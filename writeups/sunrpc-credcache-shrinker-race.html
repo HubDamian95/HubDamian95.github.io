@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A NULL pointer in the SUNRPC cred shrinker - Hubert Damian</title>
+<meta name="description" content="How a missing lock around a single pointer store let the kernel's memory shrinker dereference a destroyed credential cache.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">&larr; hubdamian95.github.io</a>
+
+  <div class="meta">
+    <span class="tag">Linux kernel</span>
+    <span class="tag">sunrpc / auth_gss</span>
+    <span class="tag">race condition</span>
+    <span class="tag status">Submitted upstream, under review</span>
+  </div>
+  <h1>A NULL pointer in the SUNRPC cred shrinker</h1>
+  <p class="lede">A one-line store without a lock, a memory shrinker running at the wrong moment, and a kernel oops in <code>kswapd</code> at address <code>0xc</code>.</p>
+
+  <h2>The symptom</h2>
+  <p>On a kernel running Kerberos-secured NFS, <code>kswapd0</code> crashed with a page fault on a tiny address:</p>
+<pre><code>BUG: unable to handle page fault for address: 000000000000000c
+#PF: supervisor write access in kernel mode
+RIP: 0010:_raw_spin_lock+0x13/0x60
+Call Trace:
+ rpcauth_unhash_cred+0x45/0x90 [sunrpc]
+ rpcauth_cache_do_shrink+0xb0/0x1e0 [sunrpc]
+ rpcauth_cache_shrink_scan+0x34/0x50 [sunrpc]
+ do_shrink_slab
+ shrink_slab
+ shrink_node
+ balance_pgdat
+ kswapd
+Comm: kswapd0   6.8.0-111-generic</code></pre>
+  <p>An oops at <code>0xc</code> almost always means "NULL plus a small struct offset". Here <code>0xc</code> is <code>offsetof(struct rpc_cred_cache, lock)</code>. Something was taking a spinlock inside a <code>struct rpc_cred_cache</code> that was NULL.</p>
+
+  <h2>Where the NULL comes from</h2>
+  <p>Each GSS authenticator (<code>struct rpc_auth</code>) owns a credential cache, reachable through <code>auth-&gt;au_credcache</code>. When an auth is destroyed, <code>rpcauth_destroy_credcache()</code> does this:</p>
+<pre><code>auth-&gt;au_credcache = NULL;        <span class="del">/* no lock held */</span>
+rpcauth_clear_credcache(cache);   <span class="dim">/* takes rpc_credcache_lock */</span></code></pre>
+  <p>The pointer is cleared <em>before</em> the global <code>rpc_credcache_lock</code> is taken to unhash the auth's credentials. For a short window, credentials that belong to the auth being destroyed are still sitting on the global <code>cred_unused</code> LRU list, still flagged <code>RPCAUTH_CRED_HASHED</code>, while their auth already points at no cache.</p>
+  <p>The memory shrinker walks exactly that list.</p>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" width="740" height="262" viewBox="0 0 740 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline of two threads. The teardown thread clears au_credcache without a lock. The kswapd shrinker, running in that window, reads the NULL pointer and takes a spinlock at address 0xc before the teardown thread reaches rpcauth_clear_credcache.">
+      <text class="lane-title" x="20" y="34">gss_destroy()</text>
+      <text x="20" y="49">teardown thread</text>
+      <line class="lane" x1="20" y1="62" x2="720" y2="62"/>
+
+      <text class="lane-title" x="20" y="150">kswapd0</text>
+      <text x="20" y="165">memory shrinker</text>
+      <line class="lane" x1="20" y1="178" x2="720" y2="178"/>
+
+      <g class="step hot">
+        <rect x="150" y="20" width="190" height="42" rx="6"/>
+        <text x="245" y="38" text-anchor="middle">au_credcache = NULL</text>
+        <text x="245" y="53" text-anchor="middle">no lock held</text>
+      </g>
+      <g class="step">
+        <rect x="520" y="20" width="190" height="42" rx="6"/>
+        <text x="615" y="38" text-anchor="middle">rpcauth_clear_credcache()</text>
+        <text x="615" y="53" text-anchor="middle">takes rpc_credcache_lock</text>
+      </g>
+
+      <g class="step">
+        <rect x="180" y="108" width="170" height="42" rx="6"/>
+        <text x="265" y="126" text-anchor="middle">shrink_scan()</text>
+        <text x="265" y="141" text-anchor="middle">takes rpc_credcache_lock</text>
+      </g>
+      <g class="step">
+        <rect x="360" y="108" width="140" height="42" rx="6"/>
+        <text x="430" y="126" text-anchor="middle">walks cred_unused</text>
+        <text x="430" y="141" text-anchor="middle">cred still HASHED</text>
+      </g>
+      <g class="step hot">
+        <rect x="355" y="196" width="230" height="46" rx="6"/>
+        <text x="470" y="215" text-anchor="middle">spin_lock(&amp;NULL-&gt;lock)</text>
+        <text x="470" y="231" text-anchor="middle">fault at address 0xc</text>
+      </g>
+
+      <path class="link" d="M245,62 L245,108"/>
+      <path class="link" d="M430,150 L430,196"/>
+      <path class="time" d="M20,252 L720,252"/>
+      <text x="700" y="248" text-anchor="end">time &rarr;</text>
+    </svg>
+  </div>
+
+  <p>The shrinker (<code>rpcauth_cache_shrink_scan()</code>, or <code>rpcauth_cache_enforce_limit()</code> on the lookup path) takes <code>rpc_credcache_lock</code>, walks <code>cred_unused</code> in <code>rpcauth_prune_expired()</code>, and reaches <code>rpcauth_unhash_cred()</code>. That function tested the <code>HASHED</code> bit, found it set, and then did this:</p>
+<pre><code>cache_lock = &amp;cred-&gt;cr_auth-&gt;au_credcache-&gt;lock;   <span class="del">/* au_credcache is NULL */</span>
+spin_lock(cache_lock);                               <span class="del">/* oops at 0xc */</span></code></pre>
+
+  <h2>Is NULL always the teardown?</h2>
+  <p>Before adding a NULL check, it is worth proving that NULL can only mean one thing. A silent early return would be wrong if there were another way to see it.</p>
+  <ul>
+    <li><code>rpcauth_destroy_credcache()</code> is only called from <code>auth_gss</code>.</li>
+    <li>Every GSS credential takes a reference on its <code>gss_auth</code> when it is created.</li>
+    <li><code>gss_destroy()</code> calls <code>rpcauth_destroy_credcache()</code> <em>before</em> <code>gss_put_auth()</code>.</li>
+  </ul>
+  <p>So while a credential is alive, its <code>cr_auth</code> is alive too, and reading NULL from <code>au_credcache</code> can only be that one store. A vmcore from the reproduction confirmed it: <code>cr_auth</code> was the auth being destroyed, <code>au_credcache</code> was 0, the credential had <code>RPCAUTH_CRED_HASHED</code> set with <code>cr_count</code> of 1, and the cache object itself was still allocated.</p>
+
+  <h2>Reproducing it on demand</h2>
+  <p>The window is tiny in production, so two changes make it reliable:</p>
+  <ol>
+    <li>Lower the <code>auth_max_cred_cachesize</code> module parameter. It defaults to <code>ULONG_MAX</code>, which is effectively no bound.</li>
+    <li>Add an <code>msleep(200)</code> between the store and <code>rpcauth_clear_credcache()</code>, and run the shrinker (<code>drop_caches</code>) inside that window.</li>
+  </ol>
+
+  <h2>The fix</h2>
+  <p>Treat a cleared cache as "this auth is being torn down" and leave the credential alone. <code>rpcauth_clear_credcache()</code> will unhash it and drop the hash table's reference, so nothing leaks.</p>
+<pre><code>static bool
+rpcauth_unhash_cred(struct rpc_cred *cred)
+{
+<span class="del">-    spinlock_t *cache_lock;</span>
+<span class="add">+    struct rpc_cred_cache *cache;</span>
+     bool ret;
+
+     if (!test_bit(RPCAUTH_CRED_HASHED, &amp;cred-&gt;cr_flags))
+         return false;
+<span class="del">-    cache_lock = &amp;cred-&gt;cr_auth-&gt;au_credcache-&gt;lock;</span>
+<span class="del">-    spin_lock(cache_lock);</span>
+<span class="add">+    cache = READ_ONCE(cred-&gt;cr_auth-&gt;au_credcache);</span>
+<span class="add">+    if (!cache)</span>
+<span class="add">+        return false;</span>
+<span class="add">+    spin_lock(&amp;cache-&gt;lock);</span>
+     ret = rpcauth_unhash_cred_locked(cred);
+<span class="del">-    spin_unlock(cache_lock);</span>
+<span class="add">+    spin_unlock(&amp;cache-&gt;lock);</span>
+     return ret;
+ }
+
+ <span class="dim">/* in rpcauth_destroy_credcache() */</span>
+<span class="del">-        auth-&gt;au_credcache = NULL;</span>
+<span class="add">+        WRITE_ONCE(auth-&gt;au_credcache, NULL);</span></code></pre>
+  <ul>
+    <li><strong>One read.</strong> The old code dereferenced <code>au_credcache</code> in the middle of an expression. The new code reads it once into a local, so the NULL test and the lock use the same value.</li>
+    <li><strong><code>READ_ONCE</code> / <code>WRITE_ONCE</code>.</strong> The store is made without the lock and the load happens under a different one, so the compiler must not tear, fuse, or re-read either access. These annotations say so explicitly.</li>
+    <li><strong>Lock ordering is unchanged.</strong> It is still <code>rpc_credcache_lock</code>, then <code>cache-&gt;lock</code>.</li>
+  </ul>
+
+  <div class="callout">
+    <p><strong>Takeaway.</strong> A pointer that is published as NULL without a lock is only safe if every reader treats NULL as a valid state. The fix is not a new lock. It is making the reader handle the state the writer already creates.</p>
+  </div>
+
+  <div class="sources">
+    <p>Patch: <a href="https://lore.kernel.org/all/20261125180751.3804694-1-dan.aloni@vastdata.com/">[PATCH] sunrpc: don't dereference a destroyed credcache from the cred shrinker</a> (linux-nfs, 25 Nov 2026). Worked on with the VAST Data team, who submitted it upstream. Status: submitted, under review.</p>
+  </div>
+
+  <footer>Built and hosted with GitHub Pages.</footer>
+</div>
+</body>
+</html>
