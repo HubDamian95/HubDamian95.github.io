@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gssd said "good until" while every mount failed - Hubert Damian</title>
+<meta name="description" content="gssd trusted a cached endtime instead of the Kerberos ticket cache itself. Notes on a stale-cache bug in nfs-utils and the fix.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">&larr; hubdamian95.github.io</a>
+
+  <div class="meta">
+    <span class="tag">nfs-utils</span>
+    <span class="tag">gssd</span>
+    <span class="tag">Kerberos</span>
+    <span class="tag status">Submitted upstream, under review</span>
+  </div>
+  <h1>gssd said "good until" while every upcall failed</h1>
+  <p class="lede">A daemon that trusts its memory of the last time it did something, instead of looking at the thing itself, will eventually lie confidently. This is one of those bugs.</p>
+
+  <h2>The symptom</h2>
+  <p>On a Kerberos-secured NFS client, machine-credential upcalls started failing for hours. The kernel received <code>-EACCES</code> (err <code>-13</code>) on every downcall. Meanwhile <code>rpc.gssd</code> kept logging, right before each failure:</p>
+<pre><code>Credentials in CC 'FILE:...' are good until &lt;a time 10 hours ahead&gt;
+Failed to create machine krb5 context</code></pre>
+  <p>The log said the credentials were fine, and the next line said they were not.</p>
+
+  <h2>How the cache check worked</h2>
+  <p><code>gssd_get_single_krb5_cred()</code> decides whether it needs to run <code>kinit</code> from the keytab. It skipped the kinit while two things were true:</p>
+  <ol>
+    <li><code>ple-&gt;endtime</code>, the endtime of <em>gssd's own last kinit</em>, was more than five minutes away, and</li>
+    <li>the machine ccache file existed.</li>
+  </ol>
+  <p>Nothing ever read the file again. Existence and modification time say nothing about what is inside it.</p>
+
+  <div class="callout bad">
+    <p><strong>The failure mode.</strong> Another writer replaces the machine ccache with a different ticket, and that ticket later expires. gssd's remembered endtime still looks healthy, the file still exists, and gssd keeps returning success for a credential it never re-examined.</p>
+  </div>
+
+  <p>In the environment where this surfaced, a separate service kept the machine ccache fresh by atomically replacing the file. When <em>that</em> service's ticket expired, gssd had no way to notice.</p>
+
+  <h2>What actually matters in a ccache</h2>
+  <p>A file ccache is a list of tickets. libkrb5 appends every new service ticket to the selected ccache, so a cache can be full of service tickets and still be useless. Only the <strong>TGT</strong> (ticket-granting ticket) can obtain a ticket for a server that is not already in the file. If the TGT is gone or expired, nothing new can be fetched.</p>
+
+  <h2>The fix: read the cache every time</h2>
+  <p>For the file ccache, gssd now reads it on every call. The cache is accepted only if all of this holds:</p>
+  <ul>
+    <li>its default principal equals <code>ple-&gt;princ</code> (GSS-API initiates as that name),</li>
+    <li>it holds a <code>krbtgt/REALM@REALM</code> ticket,</li>
+    <li>that ticket was issued to <code>ple-&gt;princ</code>,</li>
+    <li>it has already started, and is not flagged invalid (postdated),</li>
+    <li>it is valid for at least another five minutes, which is the existing clock-skew margin.</li>
+  </ul>
+  <p>If so, gssd uses it. Otherwise it runs <code>kinit</code> from the keytab exactly as before. The memcache path is unchanged, and so is the "good until" log text, which now reports the endtime of the TGT actually found in the file.</p>
+
+  <h2>A race hiding inside the check</h2>
+  <p>Each <code>krb5_cc_*</code> call on a FILE ccache reopens the file. If something renames a new file into place between <code>krb5_cc_get_principal()</code> and the scan for the TGT, the code could pair the <em>old</em> file's principal with the <em>new</em> file's TGT, and approve a cache that was never consistent.</p>
+  <p>So the TGT's client is verified <em>in the same scan</em> that finds the TGT, which reads from one open file. The default principal is still compared as well.</p>
+
+  <h2>Why no lock</h2>
+  <p>Replacing a file with <code>rename(2)</code> is atomic, so a reader sees either the whole old file or the whole new one. A read that races gssd's own <code>kinit</code> just fails the check and falls into the existing locked kinit path. There is no state to protect.</p>
+  <p>As a side effect, where an external refresher keeps the file valid, gssd now never runs <code>kinit</code>, so it no longer fights that refresher over the file.</p>
+
+  <h2>A second bug: the retry that retried nothing</h2>
+  <p>While in <code>krb5_use_machine_creds()</code>, the same patch fixes a literal <code>0</code> passed where the retry flag belonged:</p>
+<pre><code>gssd_refresh_krb5_machine_credential(clp-&gt;servername,
+<span class="del">-                     service, srchost, 0);</span>
+<span class="add">+                     service, srchost, nocache);</span></code></pre>
+  <p>The code path logs "Machine cache prematurely expired or corrupted trying to recreate cache" and retries, but because it passed <code>0</code> every time, the retry repeated the first attempt with identical arguments. It now skips the ccache check and runs <code>kinit</code> from the keytab, which is what a retry should do.</p>
+
+  <h2>Before and after</h2>
+  <table>
+    <tr><th></th><th>Before</th><th>After</th></tr>
+    <tr><td>Source of truth</td><td>gssd's remembered <code>ple-&gt;endtime</code></td><td>The TGT currently in the ccache</td></tr>
+    <tr><td>File check</td><td><code>open()</code> succeeds</td><td>Principal, realm, client, start time, flags, endtime</td></tr>
+    <tr><td>External writer replaces the file</td><td>Not noticed</td><td>Noticed on the next call</td></tr>
+    <tr><td>Retry after failure</td><td>Same arguments as first try</td><td>Forces a keytab kinit</td></tr>
+  </table>
+
+  <div class="callout">
+    <p><strong>Takeaway.</strong> Cache invalidation by "I remember when I last wrote it" breaks as soon as anyone else may write. Re-validate against the real object, and make sure every field you compare comes from the same read.</p>
+  </div>
+
+  <div class="sources">
+    <p>Patch: <a href="https://lore.kernel.org/all/20261125182211.3830485-1-dan.aloni@vastdata.com/">[PATCH] gssd: check the machine ccache's TGT instead of a cached endtime</a> (linux-nfs, 25 Nov 2026). Worked on with the VAST Data team, who submitted it upstream. Status: submitted, under review.</p>
+  </div>
+
+  <footer>Built and hosted with GitHub Pages.</footer>
+</div>
+</body>
+</html>
